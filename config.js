@@ -15,7 +15,7 @@ const portfolioConfig = {
         github: "https://github.com/ItsMeVikashKumarSingh",
         telegram: "https://t.me/encrypted_ghost",
         instagram: "https://www.instagram.com/encrypted.ghost",
-        portfolio: "https://aboutvikash.netlify.app"
+        portfolio: "https://portfolio-vikash-kumar-singh.netlify.app"
     },
     
     publications: [
@@ -45,7 +45,7 @@ const portfolioConfig = {
             {
                 name: "Zorvik-AI",
                 github: "https://github.com/ItsMeVikashKumarSingh/Zorvik-AI",
-                demo: "#",
+                demo: "https://zorvik.netlify.app",
                 hasDocsLink: false
             },
             {

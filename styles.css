@@ -990,10 +990,19 @@ section {
     color: white;
 }
 
+/* ============ RESPONSIVE GRID LAYOUTS - FIXED ============ */
 .projects-grid-featured {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.other-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
     max-width: 800px;
     margin: 0 auto;
 }
@@ -1119,14 +1128,6 @@ section {
 .other-projects {
     background: var(--bg-darker);
     padding: 80px 0;
-}
-
-.other-projects-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    max-width: 800px;
-    margin: 0 auto;
 }
 
 .mini-project-card {
@@ -1975,16 +1976,17 @@ section {
     51%, 100% { opacity: 0; }
 }
 
-/* ============ RESPONSIVE DESIGN ============ */
+/* ============ RESPONSIVE DESIGN - FIXED ============ */
 @media (max-width: 1024px) {
+    .nav-cta {
+        display: none;
+    }
+    
+    /* Keep desktop layout on tablets */
     .projects-grid-featured,
     .other-projects-grid {
         grid-template-columns: repeat(2, 1fr);
         max-width: 800px;
-    }
-    
-    .nav-cta {
-        display: none;
     }
 }
 
@@ -2033,10 +2035,12 @@ section {
         justify-content: center;
     }
 
+    /* FIXED: Single column on mobile */
     .projects-grid-featured,
     .other-projects-grid {
-        grid-template-columns: 1fr;
-        max-width: 400px;
+        grid-template-columns: 1fr !important;
+        max-width: 500px;
+        gap: 1.5rem;
     }
 
     .contribution-header {
@@ -2179,6 +2183,13 @@ section {
     
     .mini-project-description {
         font-size: 0.85rem;
+    }
+
+    /* Ensure single column on small screens */
+    .projects-grid-featured,
+    .other-projects-grid {
+        grid-template-columns: 1fr !important;
+        max-width: 350px;
     }
 }
 
