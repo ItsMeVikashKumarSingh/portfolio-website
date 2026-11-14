@@ -364,8 +364,15 @@ img {
     color: var(--text-primary);
 }
 
-.hero-title .highlight {
+.hero-title .highlight,
+.hero-title .hero-name-accent {
     color: var(--gold-bright);
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    display: inline !important;
 }
 
 .hero-subtitle {
