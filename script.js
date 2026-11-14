@@ -1,668 +1,546 @@
-// Initialize AOS with enhanced animations
-AOS.init({
-    duration: 600,
-    easing: 'ease-out-cubic',
-    once: true,
-    offset: 100,
-    delay: 100
-});
+/**
+ * Vikash Kumar Singh — Portfolio Application Script
+ * Dynamically binds content from config.js into the DOM.
+ * Powers 3D interactive tilt physics, glass highlights & active state tracking.
+ */
 
-// ============ NAVIGATION ============
-const navToggle = document.getElementById('nav-toggle');
-const navMenu = document.getElementById('nav-menu');
-const navbar = document.getElementById('navbar');
-
-// Mobile menu toggle
-navToggle.addEventListener('click', () => {
-    navMenu.classList.toggle('active');
-    navToggle.classList.toggle('active');
-});
-
-// Close menu when clicking on a link
-document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-        navMenu.classList.remove('active');
-        navToggle.classList.remove('active');
-        
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        e.target.classList.add('active');
-    });
-});
-
-// Close menu when clicking outside
-document.addEventListener('click', (e) => {
-    if (!navMenu.contains(e.target) && !navToggle.contains(e.target)) {
-        navMenu.classList.remove('active');
-        navToggle.classList.remove('active');
+document.addEventListener('DOMContentLoaded', () => {
+    // Check if configuration exists
+    if (typeof portfolioConfig === 'undefined') {
+        console.error('portfolioConfig not found. Please ensure config.js is loaded before script.js.');
+        return;
     }
+
+    const cfg = portfolioConfig;
+
+    // 1. Initialize Personal & Hero Metadata
+    initHero(cfg);
+
+    // 2. Initialize Navigation & Links
+    initNavigation(cfg);
+
+    // 3. Initialize Philosophy, Ask Me About & Opportunities
+    initPhilosophy(cfg);
+
+    // 4. Initialize Skills Grid
+    initSkills(cfg);
+
+    // 5. Initialize Projects (Featured & Secondary)
+    initProjects(cfg);
+
+    // 7. Initialize Publications
+    initPublications(cfg);
+
+    // 8. Initialize Certifications
+    initCertifications(cfg);
+
+    // 9. Initialize Contact & Form Submission (with Reason dropdown)
+    initContact(cfg);
+
+    // 10. Initialize Scroll & UI Interactions
+    initUIInteractions();
+
+    // 11. Initialize 3D Parallax & Tilt Engine
+    init3DTilt();
 });
 
-// ============ NAVBAR SCROLL EFFECT ============
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
-    }
+/* ==========================================================================
+   1. HERO INITIALIZATION
+   ========================================================================== */
+function initHero(cfg) {
+    const p = cfg.personal;
     
+    // Page Title
+    if (p.name && p.role) {
+        document.title = `${p.name} — ${p.role}`;
+    }
+
+    // Avatar
+    const avatarImg = document.getElementById('hero-avatar-img');
+    const navAvatar = document.getElementById('nav-avatar');
+    if (avatarImg && p.avatar) avatarImg.src = p.avatar;
+    if (navAvatar && p.avatar) navAvatar.src = p.avatar;
+
+    // Text & Badges
+    setElemText('hero-name', p.name);
+    setElemText('card-name', p.name);
+    setElemText('hero-subtitle', p.role);
+    setElemText('card-designation', `${p.designation} @ ${p.company}`);
+    setElemText('hero-description', p.tagline);
+    setElemText('hero-status-text', p.status);
+
+    // Resume buttons
+    const navResumeBtn = document.getElementById('nav-resume-btn');
+    const heroResumeLink = document.getElementById('hero-resume-link');
+    if (navResumeBtn && p.resumeUrl) {
+        navResumeBtn.href = p.resumeUrl;
+        if (p.resumeUrl.startsWith('http')) {
+            navResumeBtn.target = '_blank';
+            navResumeBtn.rel = 'noopener noreferrer';
+            navResumeBtn.removeAttribute('download');
+        }
+    }
+    if (heroResumeLink && p.resumeUrl) {
+        heroResumeLink.href = p.resumeUrl;
+        if (p.resumeUrl.startsWith('http')) {
+            heroResumeLink.target = '_blank';
+            heroResumeLink.rel = 'noopener noreferrer';
+            heroResumeLink.removeAttribute('download');
+        }
+    }
+
+    // Hero Socials
+    const socialsContainer = document.getElementById('hero-socials');
+    if (socialsContainer && cfg.contact) {
+        socialsContainer.innerHTML = '';
+        const socialMap = [
+            { key: 'github', icon: 'fab fa-github', title: 'GitHub Profile' },
+            { key: 'linkedin', icon: 'fab fa-linkedin-in', title: 'LinkedIn Profile' },
+            { key: 'telegram', icon: 'fab fa-telegram', title: 'Telegram Dispatch' },
+            { key: 'instagram', icon: 'fab fa-instagram', title: 'Instagram' },
+            { key: 'email', icon: 'fas fa-envelope', title: 'Email Me', prefix: 'mailto:' }
+        ];
+
+        socialMap.forEach(item => {
+            const rawVal = cfg.contact[item.key];
+            if (rawVal) {
+                const href = item.prefix ? `${item.prefix}${rawVal}` : rawVal;
+                const link = document.createElement('a');
+                link.href = href;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'social-icon-btn';
+                link.title = item.title;
+                link.innerHTML = `<i class="${item.icon}"></i>`;
+                socialsContainer.appendChild(link);
+            }
+        });
+    }
+
+    // Hero Metrics Card
+    const metricsGrid = document.getElementById('hero-metrics-grid');
+    if (metricsGrid && cfg.stats) {
+        metricsGrid.innerHTML = '';
+        cfg.stats.forEach(st => {
+            const box = document.createElement('div');
+            box.className = 'metric-box';
+            box.innerHTML = `
+                <div class="metric-label"><i class="${st.icon}" style="margin-right: 4px;"></i>${escapeHTML(st.label)}</div>
+                <div class="metric-value">${escapeHTML(st.value)}</div>
+                <div class="metric-note">${escapeHTML(st.note || '')}</div>
+            `;
+            metricsGrid.appendChild(box);
+        });
+    }
+}
+
+/* ==========================================================================
+   2. NAVIGATION & LINKS
+   ========================================================================== */
+function initNavigation(cfg) {
+    const brandName = document.getElementById('nav-brand-name');
+    if (brandName && cfg.personal.name) {
+        brandName.textContent = cfg.personal.name;
+    }
+
+    // Mobile nav toggle
+    const navToggle = document.getElementById('nav-toggle');
+    const navMenu = document.getElementById('nav-menu');
+
+    if (navToggle && navMenu) {
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        // Close when clicking a nav link
+        navMenu.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+            });
+        });
+    }
+}
+
+/* ==========================================================================
+   3. PHILOSOPHY, ASK ME ABOUT & OPPORTUNITIES
+   ========================================================================== */
+function initPhilosophy(cfg) {
+    const p = cfg.personal;
+    if (p.philosophy) {
+        setElemText('philosophy-headline', `"${p.philosophy.headline}"`);
+        setElemText('philosophy-desc', p.philosophy.description);
+    }
+    if (p.funFact) {
+        setElemText('fun-fact-text', p.funFact);
+    }
+
+    // Ask Me About Pills
+    const pillsContainer = document.getElementById('ask-me-pills');
+    if (pillsContainer && p.askMeAbout) {
+        pillsContainer.innerHTML = '';
+        p.askMeAbout.forEach(topic => {
+            const pill = document.createElement('span');
+            pill.className = 'pill-item';
+            pill.textContent = topic;
+            pillsContainer.appendChild(pill);
+        });
+    }
+
+    // Open For Roles Pills
+    const lookingForContainer = document.getElementById('looking-for-pills');
+    if (lookingForContainer && cfg.lookingFor) {
+        lookingForContainer.innerHTML = '';
+        cfg.lookingFor.forEach(role => {
+            const pill = document.createElement('span');
+            pill.className = 'pill-item';
+            pill.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+            pill.style.color = 'var(--gold-bright)';
+            pill.textContent = role;
+            lookingForContainer.appendChild(pill);
+        });
+    }
+}
+
+/* ==========================================================================
+   4. SKILLS SECTION
+   ========================================================================== */
+function initSkills(cfg) {
+    const skillsGrid = document.getElementById('skills-grid');
+    if (!skillsGrid || !cfg.skills) return;
+
+    skillsGrid.innerHTML = '';
+    cfg.skills.forEach(cat => {
+        const card = document.createElement('div');
+        card.className = 'skill-category-card card-3d';
+
+        const chipsHtml = (cat.items || []).map(item => `
+            <span class="skill-chip">
+                <span class="level-dot"></span>
+                <span>${escapeHTML(item.name)}</span>
+            </span>
+        `).join('');
+
+        card.innerHTML = `
+            <div class="skill-cat-header">
+                <div class="skill-cat-icon"><i class="${cat.icon || 'fas fa-code'}"></i></div>
+                <h3 class="skill-cat-title">${escapeHTML(cat.category)}</h3>
+            </div>
+            <div class="skill-chips">
+                ${chipsHtml}
+            </div>
+        `;
+        skillsGrid.appendChild(card);
+    });
+}
+
+/* ==========================================================================
+   5. PROJECTS SECTION
+   ========================================================================== */
+function initProjects(cfg) {
+    const featuredGrid = document.getElementById('featured-projects-grid');
+    const moreGrid = document.getElementById('more-projects-grid');
+
+    // Featured Projects
+    if (featuredGrid && cfg.projects && cfg.projects.featured) {
+        featuredGrid.innerHTML = '';
+        cfg.projects.featured.forEach(prj => {
+            const card = document.createElement('div');
+            card.className = 'project-card card-3d';
+
+            const techTags = (prj.tech || []).map(t => `<span class="tech-tag">${escapeHTML(t)}</span>`).join('');
+            
+            let actionsHtml = '';
+            if (prj.github) {
+                actionsHtml += `<a href="${prj.github}" target="_blank" rel="noopener noreferrer" class="project-link"><i class="fab fa-github"></i> Repository</a>`;
+            }
+            if (prj.demo && prj.demo !== '#') {
+                actionsHtml += `<a href="${prj.demo}" target="_blank" rel="noopener noreferrer" class="project-link" style="color: var(--gold-bright);"><i class="fas fa-arrow-up-right-from-square"></i> Live Demo</a>`;
+            }
+
+            card.innerHTML = `
+                <div class="project-top">
+                    <div class="project-header-row">
+                        <h3 class="project-title">${escapeHTML(prj.name)}</h3>
+                    </div>
+                    <div class="project-tagline">${escapeHTML(prj.tagline || '')}</div>
+                    <p class="project-desc">${escapeHTML(prj.description)}</p>
+                    <div class="project-tech-tags">${techTags}</div>
+                </div>
+                <div class="project-actions">${actionsHtml}</div>
+            `;
+            featuredGrid.appendChild(card);
+        });
+    }
+
+    // Additional Projects
+    if (moreGrid && cfg.projects && cfg.projects.more) {
+        moreGrid.innerHTML = '';
+        cfg.projects.more.forEach(prj => {
+            const card = document.createElement('div');
+            card.className = 'mini-project-card card-3d';
+
+            const techTags = (prj.tech || []).map(t => `<span class="tech-tag">${escapeHTML(t)}</span>`).join('');
+
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: var(--text-primary);">${escapeHTML(prj.name)}</h4>
+                    ${prj.github ? `<a href="${prj.github}" target="_blank" rel="noopener noreferrer" class="project-link"><i class="fab fa-github"></i></a>` : ''}
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 14px;">${escapeHTML(prj.description)}</p>
+                <div class="project-tech-tags" style="margin-bottom: 0;">${techTags}</div>
+            `;
+            moreGrid.appendChild(card);
+        });
+    }
+}
+
+/* ==========================================================================
+   7. PUBLICATIONS SECTION
+   ========================================================================== */
+function initPublications(cfg) {
+    const pubGrid = document.getElementById('publications-grid');
+    if (!pubGrid || !cfg.publications) return;
+
+    pubGrid.innerHTML = '';
+    cfg.publications.forEach(pub => {
+        const card = document.createElement('div');
+        card.className = 'publication-card card-3d';
+
+        const keywordsHtml = (pub.keywords || []).map(k => `<span class="keyword-tag">${escapeHTML(k)}</span>`).join('');
+
+        card.innerHTML = `
+            <div>
+                <div class="publication-journal">${escapeHTML(pub.journal)} · ${escapeHTML(pub.volume)}</div>
+                <h3 class="publication-title">${escapeHTML(pub.title)}</h3>
+                <p class="publication-desc">${escapeHTML(pub.description)}</p>
+                <div class="publication-keywords">${keywordsHtml}</div>
+            </div>
+            <div>
+                <a href="${pub.url}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="font-size: 0.82rem; padding: 8px 16px;">
+                    <i class="fas fa-file-pdf" style="color: #ef4444;"></i> Read Journal PDF
+                </a>
+            </div>
+        `;
+        pubGrid.appendChild(card);
+    });
+}
+
+/* ==========================================================================
+   8. CERTIFICATIONS SECTION
+   ========================================================================== */
+function initCertifications(cfg) {
+    const certGrid = document.getElementById('certifications-grid');
+    if (!certGrid || !cfg.certifications) return;
+
+    certGrid.innerHTML = '';
+    cfg.certifications.forEach(cert => {
+        const card = document.createElement('div');
+        card.className = 'cert-card card-3d';
+
+        card.innerHTML = `
+            <div class="cert-icon"><i class="${cert.icon || 'fas fa-award'}"></i></div>
+            <div class="cert-info">
+                <h3>${escapeHTML(cert.title)}</h3>
+                <div class="cert-issuer">${escapeHTML(cert.issuer)}</div>
+                <p class="cert-desc">${escapeHTML(cert.description)}</p>
+            </div>
+        `;
+        certGrid.appendChild(card);
+    });
+}
+
+/* ==========================================================================
+   9. CONTACT SECTION & WEB3FORMS (WITH REASONS)
+   ========================================================================== */
+function initContact(cfg) {
+    // Populate direct contact channels
+    const channelsContainer = document.getElementById('contact-channels');
+    if (channelsContainer && cfg.contact) {
+        channelsContainer.innerHTML = '';
+        const items = [
+            { label: cfg.contact.email, icon: 'fas fa-envelope', href: `mailto:${cfg.contact.email}` },
+            { label: 'LinkedIn Profile', icon: 'fab fa-linkedin', href: cfg.contact.linkedin },
+            { label: 'GitHub Repositories', icon: 'fab fa-github', href: cfg.contact.github },
+            { label: 'Telegram Direct', icon: 'fab fa-telegram', href: cfg.contact.telegram },
+            { label: 'Instagram', icon: 'fab fa-instagram', href: cfg.contact.instagram }
+        ];
+
+        items.forEach(it => {
+            if (it.href && !it.href.includes('undefined')) {
+                const a = document.createElement('a');
+                a.href = it.href;
+                a.className = 'channel-item';
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.innerHTML = `
+                    <div class="channel-icon"><i class="${it.icon}"></i></div>
+                    <span class="channel-label">${escapeHTML(it.label)}</span>
+                `;
+                channelsContainer.appendChild(a);
+            }
+        });
+    }
+
+    // Configure Web3Forms access key
+    const accessKeyInput = document.getElementById('form-access-key');
+    if (accessKeyInput && cfg.contactForm && cfg.contactForm.accessKey) {
+        accessKeyInput.value = cfg.contactForm.accessKey;
+    }
+
+    // Populate Subject / Reason Dropdown
+    const reasonSelect = document.getElementById('sender-reason');
+    if (reasonSelect && cfg.contactForm && cfg.contactForm.inquiryTypes) {
+        reasonSelect.innerHTML = '<option value="" disabled selected>Select Subject / Reason</option>';
+        cfg.contactForm.inquiryTypes.forEach(opt => {
+            const el = document.createElement('option');
+            el.value = opt.value;
+            el.textContent = opt.label;
+            reasonSelect.appendChild(el);
+        });
+    }
+
+    // Handle form submit
+    const contactForm = document.getElementById('contact-form');
+    const formStatus = document.getElementById('form-status');
+    const submitBtn = document.getElementById('form-submit-btn');
+
+    if (contactForm && cfg.contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!submitBtn || !formStatus) return;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending message...';
+            formStatus.className = 'form-status';
+            formStatus.textContent = '';
+
+            const formData = new FormData(contactForm);
+            const actionUrl = cfg.contactForm.actionUrl || 'https://api.web3forms.com/submit';
+
+            try {
+                const res = await fetch(actionUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    formStatus.className = 'form-status success';
+                    formStatus.textContent = '✓ Message sent successfully! I will reply shortly.';
+                    contactForm.reset();
+                } else {
+                    formStatus.className = 'form-status error';
+                    formStatus.textContent = `Error: ${data.message || 'Unable to send message. Please email me directly.'}`;
+                }
+            } catch (err) {
+                formStatus.className = 'form-status error';
+                formStatus.textContent = 'Network error. Please email me directly at ' + (cfg.contact.email || '');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+            }
+        });
+    }
+
+    // Footer Year
+    const yearSpan = document.getElementById('current-year');
+    if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+    }
+}
+
+/* ==========================================================================
+   10. UI SCROLL & ACTIVE STATE INTERACTIONS
+   ========================================================================== */
+function initUIInteractions() {
+    const navbar = document.getElementById('navbar');
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-link');
-    
-    let current = '';
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop - 100;
-        const sectionHeight = section.clientHeight;
-        if (window.pageYOffset >= sectionTop && window.pageYOffset < sectionTop + sectionHeight) {
-            current = section.getAttribute('id');
-        }
-    });
-    
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
-            link.classList.add('active');
-        }
-    });
-});
 
-// ============ SMOOTH SCROLLING ============
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            const headerOffset = 80;
-            const elementPosition = target.offsetTop;
-            const offsetPosition = elementPosition - headerOffset;
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
-        }
-    });
-});
-
-// ============ TYPING EFFECT ============
-function typeWriter(element, text, speed = 60) {
-    if (!element) return;
-    
-    let i = 0;
-    element.innerHTML = '';
-    
-    function type() {
-        if (i < text.length) {
-            element.innerHTML += text.charAt(i);
-            i++;
-            setTimeout(type, speed);
+    window.addEventListener('scroll', () => {
+        // Navbar blur elevation
+        if (window.scrollY > 40) {
+            navbar.classList.add('scrolled');
         } else {
-            element.innerHTML += '<span class="cursor">|</span>';
+            navbar.classList.remove('scrolled');
         }
-    }
-    type();
-}
 
-window.addEventListener('load', () => {
-    const heroTitle = document.querySelector('.typed-text');
-    if (heroTitle) {
-        setTimeout(() => {
-            typeWriter(heroTitle, 'Vikash Kumar Singh', 80);
-        }, 1000);
-    }
-});
-
-// ============ COUNTER ANIMATION ============
-function animateCounter(element, target, duration = 1500) {
-    let current = 0;
-    const increment = target / (duration / 30);
-    
-    const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-            element.textContent = target;
-            clearInterval(timer);
-        } else {
-            element.textContent = Math.floor(current);
-        }
-    }, 30);
-}
-
-const observeCounters = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const counter = entry.target;
-            const target = parseInt(counter.getAttribute('data-count'));
-            animateCounter(counter, target);
-            observeCounters.unobserve(counter);
-        }
-    });
-});
-
-document.querySelectorAll('[data-count]').forEach(counter => {
-    observeCounters.observe(counter);
-});
-
-// ============ SKILL BARS ANIMATION ============
-function animateSkillBars() {
-    const skillBars = document.querySelectorAll('.skill-progress');
-    
-    skillBars.forEach((bar, index) => {
-        const width = bar.getAttribute('data-width');
-        if (width) {
-            setTimeout(() => {
-                bar.style.width = width;
-            }, index * 100);
-        }
-    });
-}
-
-function animateProgressBars() {
-    const progressBars = document.querySelectorAll('.progress');
-    
-    progressBars.forEach((bar, index) => {
-        const width = bar.getAttribute('data-width');
-        if (width) {
-            setTimeout(() => {
-                bar.style.width = width;
-            }, index * 200);
-        }
-    });
-}
-
-const observeAnimations = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            if (entry.target.classList.contains('skills-container')) {
-                animateSkillBars();
-            } else if (entry.target.classList.contains('project-progress')) {
-                animateProgressBars();
+        // Active link tracking
+        let currentSectionId = '';
+        sections.forEach(sec => {
+            const secTop = sec.offsetTop - 120;
+            const secHeight = sec.clientHeight;
+            if (window.scrollY >= secTop && window.scrollY < secTop + secHeight) {
+                currentSectionId = sec.getAttribute('id');
             }
-        }
-    });
-}, { threshold: 0.3 });
+        });
 
-document.querySelectorAll('.skills-container, .project-progress').forEach(element => {
-    observeAnimations.observe(element);
-});
-
-// ============ DYNAMIC PROJECT RENDERING ============
-function getProjectIcon(projectName) {
-    const iconMap = {
-        'Zorvik-AI': 'fas fa-robot',
-        'RideEase': 'fas fa-car',
-        'AppBlocker': 'fas fa-shield-alt',
-        'E-Shop': 'fas fa-shopping-cart',
-        'Server': 'fas fa-server',
-        'FrontDesk Agent': 'fas fa-robot',
-        'BrainStormer': 'fas fa-brain',
-        'Instagram Auto Responder': 'fab fa-instagram',
-        'Portfolio Website': 'fas fa-globe'
-    };
-    
-    return iconMap[projectName] || 'fas fa-code';
-}
-
-function getProjectFeatures(projectName) {
-    const featuresMap = {
-        'Zorvik-AI': ['✨ AI Chat Interface', '📐 LaTeX Rendering', '💻 Code Support'],
-        'AppBlocker': ['🔒 Stealth Mode', '🛡️ Device Admin', '📱 App Blocking'],
-        'E-Shop': ['🛒 E-commerce', '💳 Payment Gateway', '🔐 Secure Auth'],
-        'Server': ['🔑 JWT Auth', '🔥 Firebase', '📊 MongoDB']
-    };
-    
-    return featuresMap[projectName] || ['🚀 Feature 1', '⚡ Feature 2', '🎯 Feature 3'];
-}
-
-function getProjectTech(projectName) {
-    const techMap = {
-        'Zorvik-AI': ['JavaScript', 'FastAPI', 'Firebase', 'Vercel'],
-        'AppBlocker': ['Java', 'Android', 'Accessibility Services', 'Security'],
-        'E-Shop': ['Java', 'Firebase', 'Android', 'Payment APIs'],
-        'Server': ['Node.js', 'JWT', 'MongoDB', 'Firebase']
-    };
-    
-    return techMap[projectName] || ['Technology 1', 'Technology 2'];
-}
-
-function getProjectDescription(projectName) {
-    const descriptions = {
-        'Zorvik-AI': 'Advanced AI-powered chat application with next-word prediction, LaTeX mathematical rendering, and comprehensive code syntax highlighting. Built with modern web technologies for optimal performance and user experience.',
-        'AppBlocker': 'Advanced Android security application using accessibility services and device admin privileges to restrict app access. Features stealth operation and custom crash handling for parental controls and productivity.',
-        'E-Shop': 'Complete Android e-commerce platform with dual interfaces for buyers and sellers. Integrated UPI/COD payments, secure authentication, and comprehensive product management system.',
-        'Server': 'Robust backend authentication system implementing JWT tokens, Firebase Auth, and MongoDB. Features industry-standard security practices for scalable user management.'
-    };
-    
-    return descriptions[projectName] || 'Advanced project with modern technologies and best practices.';
-}
-
-function renderFeaturedProjects() {
-    const container = document.querySelector('.projects-grid-featured');
-    if (!container || !portfolioConfig.projects.featured) return;
-    
-    container.innerHTML = '';
-    
-    portfolioConfig.projects.featured.forEach(project => {
-        const features = getProjectFeatures(project.name);
-        const tech = getProjectTech(project.name);
-        const icon = getProjectIcon(project.name);
-        
-        const projectCard = document.createElement('div');
-        projectCard.className = 'project-card';
-        projectCard.innerHTML = `
-            <div class="project-header">
-                <div class="project-icon">
-                    <i class="${icon}"></i>
-                </div>
-                <div class="project-stats">
-                    <span class="stat"><i class="fas fa-star"></i> 0</span>
-                    <span class="stat"><i class="fas fa-code-branch"></i> 0</span>
-                </div>
-            </div>
-            <h3 class="project-title">${project.name}</h3>
-            <p class="project-description">
-                ${getProjectDescription(project.name)}
-            </p>
-            <div class="project-features">
-                ${features.map(feature => `<span class="feature">${feature}</span>`).join('')}
-            </div>
-            <div class="project-tech">
-                ${tech.map(t => `<span class="tech-tag">${t}</span>`).join('')}
-            </div>
-            <div class="project-links">
-                <a href="${project.github}" class="project-link">
-                    <i class="fab fa-github"></i> Code
-                </a>
-                <a href="${project.demo}" class="project-link">
-                    <i class="fas fa-${project.hasDocsLink ? 'book' : 'external-link-alt'}"></i> 
-                    ${project.hasDocsLink ? 'API Docs' : 'Demo'}
-                </a>
-            </div>
-        `;
-        
-        container.appendChild(projectCard);
-    });
-}
-
-function renderOtherProjects() {
-    const container = document.querySelector('.other-projects-grid');
-    if (!container || !portfolioConfig.projects.others) return;
-    
-    container.innerHTML = '';
-    
-    portfolioConfig.projects.others.forEach(project => {
-        const icon = getProjectIcon(project.name);
-        
-        const projectCard = document.createElement('div');
-        projectCard.className = 'mini-project-card';
-        projectCard.innerHTML = `
-            <div class="mini-project-header">
-                <div class="mini-project-icon">
-                    <i class="${icon}"></i>
-                </div>
-                <div class="mini-project-stats">
-                    <span class="mini-stat"><i class="fas fa-star"></i> 0</span>
-                </div>
-            </div>
-            <h4 class="mini-project-title">${project.name}</h4>
-            <p class="mini-project-description">
-                ${project.description}
-            </p>
-            <div class="mini-project-tech">
-                ${project.tech.map(t => `<span class="mini-tech-tag">${t}</span>`).join('')}
-            </div>
-            <div class="mini-project-links">
-                <a href="${project.github}" class="mini-link">
-                    <i class="fab fa-github"></i>
-                </a>
-                <a href="${project.demo}" class="mini-link">
-                    <i class="fas fa-external-link-alt"></i>
-                </a>
-            </div>
-        `;
-        
-        container.appendChild(projectCard);
-    });
-}
-
-function initializeProjectGrid() {
-    const featuredContainer = document.querySelector('.projects-grid-featured');
-    const otherContainer = document.querySelector('.other-projects-grid');
-    
-    if (featuredContainer) {
-        featuredContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        featuredContainer.style.maxWidth = '800px';
-    }
-    
-    if (otherContainer) {
-        otherContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        otherContainer.style.maxWidth = '800px';
-    }
-}
-
-// ============ FEATURED PROJECTS ROW-BY-ROW LOADING ============
-const observeFeaturedProjectRows = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const container = entry.target;
-            const projectCards = container.querySelectorAll('.project-card');
-            
-            // Group projects into rows (2 per row)
-            const rows = [];
-            for (let i = 0; i < projectCards.length; i += 2) {
-                rows.push(Array.from(projectCards).slice(i, i + 2));
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${currentSectionId}`) {
+                link.classList.add('active');
             }
-            
-            // Animate each row with delay
-            rows.forEach((row, rowIndex) => {
-                setTimeout(() => {
-                    row.forEach((card, cardIndex) => {
-                        setTimeout(() => {
-                            card.style.opacity = '1';
-                            card.style.transform = 'translateY(0) scale(1)';
-                        }, cardIndex * 150);
-                    });
-                }, rowIndex * 400);
-            });
-            
-            observeFeaturedProjectRows.unobserve(container);
+        });
+    });
+}
+
+/* ==========================================================================
+   11. 3D TILT & PARALLAX ENGINE
+   ========================================================================== */
+function init3DTilt() {
+    const selector = '.card-3d, .hero-card, .project-card, .skill-category-card, .publication-card, .cert-card, .philosophy-card, .ask-me-card, .currently-building-card';
+    const cards = document.querySelectorAll(selector);
+
+    cards.forEach(card => {
+        // Ensure 3D class is present
+        if (!card.classList.contains('card-3d')) {
+            card.classList.add('card-3d');
         }
-    });
-}, { threshold: 0.05, rootMargin: '0px 0px 100px 0px' });
 
-// ============ UNIVERSAL SECTION OBSERVER - CORRECTED ============
-const sectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const section = entry.target;
-            console.log('Animating section:', section.id);
-            
-            // Handle different sections
-            if (section.classList.contains('other-projects')) {
-                const cards = section.querySelectorAll('.mini-project-card');
-                cards.forEach((card, index) => {
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0) scale(1)';
-                    }, index * 150);
-                });
-            } 
-            else if (section.classList.contains('open-source')) {
-                const cards = section.querySelectorAll('.contribution-card');
-                cards.forEach((card, index) => {
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0) scale(1)';
-                    }, index * 200);
-                });
-            }
-            else if (section.classList.contains('publications')) {
-                const cards = section.querySelectorAll('.publication-card');
-                cards.forEach((card, index) => {
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0) scale(1)';
-                    }, index * 200);
-                });
-            }
-            else if (section.classList.contains('certifications')) {
-                const cards = section.querySelectorAll('.cert-card');
-                cards.forEach((card, index) => {
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0) scale(1)';
-                    }, index * 200);
-                });
-            }
-            
-            sectionObserver.unobserve(section);
+        // Create specular glare overlay if not present
+        if (!card.querySelector('.glare-overlay')) {
+            const glare = document.createElement('div');
+            glare.className = 'glare-overlay';
+            card.appendChild(glare);
         }
-    });
-}, { 
-    threshold: 0.1, 
-    rootMargin: '0px 0px -100px 0px' 
-});
 
-// ============ ENHANCED PROFILE CARD INTERACTIONS ============
-function enhanceProfileCard() {
-    const profileCard = document.querySelector('.profile-card');
-    const stats = document.querySelectorAll('.stat');
-    
-    if (profileCard) {
-        profileCard.addEventListener('mouseenter', () => {
-            profileCard.style.transform = 'translateY(-15px) scale(1.02)';
-            profileCard.style.boxShadow = '0 25px 50px rgba(124, 58, 237, 0.6)';
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            // Subtle, elegant 3D tilt angles (-7 to +7 deg)
+            const rotateX = ((centerY - y) / centerY) * 6;
+            const rotateY = ((x - centerX) / centerX) * 6;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-4px)`;
+            card.style.setProperty('--mouse-x', `${((x / rect.width) * 100).toFixed(1)}%`);
+            card.style.setProperty('--mouse-y', `${((y / rect.height) * 100).toFixed(1)}%`);
         });
-        
-        profileCard.addEventListener('mouseleave', () => {
-            profileCard.style.transform = 'translateY(0) scale(1)';
-            profileCard.style.boxShadow = 'var(--shadow-glow)';
-        });
-    }
-    
-    stats.forEach(stat => {
-        stat.addEventListener('mouseenter', () => {
-            stat.style.background = 'rgba(6, 182, 212, 0.2)';
-            stat.style.transform = 'translateY(-8px)';
-        });
-        
-        stat.addEventListener('mouseleave', () => {
-            stat.style.background = 'transparent';
-            stat.style.transform = 'translateY(0)';
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
         });
     });
 }
 
-// ============ ENHANCED SKILL SECTION INTERACTIONS ============
-function enhanceSkillSections() {
-    const skillCategories = document.querySelectorAll('.skill-category');
-    const techItems = document.querySelectorAll('.tech-item');
-    
-    skillCategories.forEach(category => {
-        category.addEventListener('mouseenter', () => {
-            category.style.transform = 'translateY(-10px)';
-            category.style.borderColor = 'var(--accent-color)';
-        });
-        
-        category.addEventListener('mouseleave', () => {
-            category.style.transform = 'translateY(0)';
-            category.style.borderColor = 'rgba(124, 58, 237, 0.2)';
-        });
-    });
-    
-    techItems.forEach(item => {
-        item.addEventListener('mouseenter', () => {
-            item.style.transform = 'translateY(-10px) scale(1.05)';
-            item.style.borderColor = 'var(--primary-color)';
-        });
-        
-        item.addEventListener('mouseleave', () => {
-            item.style.transform = 'translateY(0) scale(1)';
-            item.style.borderColor = 'rgba(124, 58, 237, 0.2)';
-        });
-    });
+/* ==========================================================================
+   UTILITY HELPERS
+   ========================================================================== */
+function setElemText(id, text) {
+    const elem = document.getElementById(id);
+    if (elem && text) elem.textContent = text;
 }
 
-// ============ CONTACT FORM HANDLING ============
-const contactForm = document.getElementById('contact-form');
-const formMessages = document.getElementById('form-messages');
-
-contactForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const formBtn = this.querySelector('.form-btn');
-    const btnText = formBtn.querySelector('.btn-text');
-    const btnLoading = formBtn.querySelector('.btn-loading');
-    
-    btnText.style.display = 'none';
-    btnLoading.style.display = 'flex';
-    formBtn.disabled = true;
-    
-    formMessages.innerHTML = '';
-    
-    try {
-        const formData = new FormData(this);
-        
-        const response = await fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showSuccessMessage();
-            this.reset();
-        } else {
-            throw new Error('Form submission failed');
-        }
-        
-    } catch (error) {
-        showErrorMessage();
-        console.error('Form submission error:', error);
-    } finally {
-        setTimeout(() => {
-            btnText.style.display = 'inline';
-            btnLoading.style.display = 'none';
-            formBtn.disabled = false;
-        }, 1000);
-    }
-});
-
-function showSuccessMessage() {
-    formMessages.innerHTML = `
-        <div class="success-message">
-            <i class="fas fa-check-circle"></i>
-            <h4>Message Sent Successfully!</h4>
-            <p>Thank you for reaching out. I'll get back to you within 24 hours.</p>
-        </div>
-    `;
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
-
-function showErrorMessage() {
-    formMessages.innerHTML = `
-        <div class="error-message">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h4>Oops! Something went wrong</h4>
-            <p>Please try again or contact me directly at:</p>
-            <a href="mailto:vikashkumarsingh8352@gmail.com" class="fallback-email">
-                <i class="fas fa-envelope"></i>
-                vikashkumarsingh8352@gmail.com
-            </a>
-        </div>
-    `;
-}
-
-// ============ FORM ENHANCEMENT ============
-function enhanceContactForm() {
-    const form = document.querySelector('#contact-form');
-    if (!form) return;
-    
-    const formContainer = form.parentElement;
-    formContainer.style.maxWidth = '580px';
-    formContainer.style.margin = '0 auto';
-    
-    const inputs = form.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.parentElement.style.borderColor = 'var(--primary-color)';
-        });
-        
-        input.addEventListener('blur', function() {
-            this.parentElement.style.borderColor = 'rgba(124, 58, 237, 0.2)';
-        });
-    });
-}
-
-// ============ GITHUB STATS UPDATER ============
-async function updateGitHubStats() {
-    try {
-        const response = await fetch('https://api.github.com/users/ItsMeVikashKumarSingh');
-        const data = await response.json();
-        
-        const repoCount = document.querySelector('[data-count="44"]');
-        if (repoCount && data.public_repos) {
-            repoCount.setAttribute('data-count', data.public_repos);
-        }
-        
-    } catch (error) {
-        console.log('GitHub API request failed:', error);
-    }
-}
-
-// ============ ERROR HANDLING ============
-window.addEventListener('error', (e) => {
-    console.error('JavaScript error:', e.error);
-});
-
-// ============ ACCESSIBILITY ============
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        navMenu.classList.remove('active');
-        navToggle.classList.remove('active');
-    }
-});
-
-// ============ CORRECTED INITIALIZATION ============
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing...');
-    
-    // Render dynamic projects first
-    renderFeaturedProjects();
-    renderOtherProjects();
-    initializeProjectGrid();
-    
-    // Setup observer for featured projects
-    const featuredContainer = document.querySelector('.projects-grid-featured');
-    if (featuredContainer) {
-        observeFeaturedProjectRows.observe(featuredContainer);
-    }
-    
-    // Setup observers for sections using class selectors
-    const sectionsToObserve = [
-        '.other-projects',
-        '.open-source', 
-        '.publications',
-        '.certifications'
-    ];
-    
-    sectionsToObserve.forEach(selector => {
-        const section = document.querySelector(selector);
-        if (section) {
-            console.log('Found section:', selector);
-            sectionObserver.observe(section);
-        } else {
-            console.warn('Section not found:', selector);
-        }
-    });
-    
-    // Initialize other features
-    enhanceContactForm();
-    updateGitHubStats();
-    enhanceProfileCard();
-    enhanceSkillSections();
-    
-    console.log('All animations properly initialized!');
-});
-
-window.addEventListener('resize', function() {
-    initializeProjectGrid();
-});
-
-// ============ DEBOUNCE FOR PERFORMANCE ============
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-const optimizedScrollHandler = debounce(() => {
-    // Additional scroll-based logic
-}, 10);
-
-window.addEventListener('scroll', optimizedScrollHandler);

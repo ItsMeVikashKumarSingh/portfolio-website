@@ -1,227 +1,62 @@
-# Portfolio Website - Vikash Kumar Singh
+# Vikash Kumar Singh — Engineering Portfolio
 
-A modern, responsive portfolio website showcasing Android & Backend development projects with futuristic design and smooth animations.
+A high-performance, single-source-of-truth developer portfolio for **Vikash Kumar Singh**, Software Engineer at Tata Consultancy Services (TCS), specializing in Java backend architecture, post-quantum cryptography, and autonomous AI agents.
 
-## 🚀 Features
+Designed with an **Obsidian & Deep Slate Atelier** design aesthetic — replacing harsh neon glows with architectural minimalism, refined typography, and purposeful micro-interactions.
 
-- **Modern Design**: Futuristic UI with gradient backgrounds and smooth animations
-- **Responsive Layout**: Optimized for all devices (desktop, tablet, mobile)
-- **Dynamic Content**: Projects loaded dynamically from configuration file
-- **Smooth Animations**: Loading animations for each section with staggered effects
-- **Interactive Elements**: Hover effects on cards, buttons, and navigation
-- **Contact Form**: Functional contact form with Web3Forms integration
-- **Performance Optimized**: Debounced scroll handlers and intersection observers
+---
 
-## 🛠️ Technologies Used
+## 🏛️ Architecture & Highlights
 
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Animations**: AOS (Animate On Scroll) library
-- **Icons**: Font Awesome 6.4.0
-- **Fonts**: Inter & JetBrains Mono from Google Fonts
-- **Form Handling**: Web3Forms API
-- **Assets**: JavaScript, JPG, SVG, ICO, and PNG files
-- **Version Control**: Git
+- **Single Source of Truth (`config.js`)**: All personal metadata, skills, featured projects, telemetry metrics, research papers, certifications, and Web3Forms keys are managed in a single structured configuration file. The DOM dynamically hydrates from `config.js`.
+- **Refined Non-Neon Design**: Built on obsidian deep darks (`#090d16`), subtle slate glass cards (`#0f172a`), warm amber/gold accents (`#f59e0b`), and clean typography using *Space Grotesk*, *Inter*, and *JetBrains Mono*.
+- **Curated Open Source Showcase**: Showcases production and research repositories (`Zorvik-AI`, `Student-Management`, `Secure-Authentication-System`, `RideEase`, `E-Shop`, `AppBlocker`, `pqc-migration-framework`, `hacktoberfest`).
+- **Research Publications**: Direct links and summaries for peer-reviewed papers published in the *CRD Journal (2025)* covering XChaCha20, Argon2, and Neural Program Repair.
+- **Live Engineering Velocity**: Integrates daily telemetry grid, language distribution charts, and GitHub streak tracking.
+- **Functional Contact Form**: Direct dispatch powered by Web3Forms with asynchronous submission and real-time status feedback.
 
-## 📁 Project Structure
+---
+
+## 📁 Repository Structure
 
 ```
-portfolio-website/
-├── index.html          # Main HTML file
-├── styles.css          # Complete CSS styles
-├── script.js           # JavaScript functionality
-├── config.js           # Portfolio configuration
-├── assets/            
-│   ├── profile.jpg     # Profile image
-│   ├── favicon_vks.ico # Website favicon
-│   └── vikash-kumar-singh-resume.pdf
-└── README.md           # Project documentation
+vikash-portfolio-website/
+├── index.html          # Clean semantic HTML5 skeleton
+├── styles.css          # Obsidian & Deep Slate Atelier CSS design system
+├── script.js           # Dynamic DOM hydration & interaction controller
+├── config.js           # Single configuration source of truth
+├── assets/             # Images, resume PDF, and dynamic SVGs
+│   ├── profile.jpg
+│   ├── favicon_vks.ico
+│   ├── vikash-kumar-singh-resume.pdf
+│   ├── analytics-grid.svg
+│   ├── holographic-foil.svg
+│   └── top-langs.svg
+└── README.md           # Documentation
 ```
 
-## 🎨 Sections
+---
 
-1. **Hero Section**: Introduction with typing animation and profile card
-2. **About**: Personal information, skills, and tech stack
-3. **Current Work**: RideEase project with progress indicators
-4. **Featured Projects**: Main projects with detailed descriptions
-5. **Other Projects**: Additional notable projects
-6. **Open Source**: Hacktoberfest contributions
-7. **Publications**: Research papers and publications
-8. **Certifications**: Professional certifications
-9. **Hire Me**: Call-to-action section for opportunities
-10. **Contact**: Contact form and social links
+## ⚙️ Customization
 
-## ⚙️ Setup & Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/ItsMeVikashKumarSingh/portfolio-website.git
-   cd portfolio-website
-   ```
-
-2. **Open in browser:**
-   ```bash
-   # Simply open index.html in your browser
-   open index.html
-   ```
-
-3. **Live Server (recommended):**
-   ```bash
-   # Using VS Code Live Server extension
-   # Or using Python
-   python -m http.server 8000
-   ```
-
-## 🔧 Configuration
-
-### Personal Information
-Edit `config.js` to customize:
+To update any content on the site, simply edit [config.js](file:///C:/Users/vikas/OneDrive/Desktop/projects/vikash-portfolio-website/config.js):
 
 ```javascript
 const portfolioConfig = {
     personal: {
         name: "Vikash Kumar Singh",
-        title: "Android & Backend Developer | Learning AI",
-        location: "Bihar, India",
-        // ... other details
+        role: "Java Backend Developer · AI Agents & Systems",
+        designation: "Software Engineer",
+        company: "Tata Consultancy Services (TCS)",
+        // ...
     },
-    projects: {
-        featured: [
-            // Add your featured projects
-        ],
-        others: [
-            // Add other projects
-        ]
-    }
+    // projects, skills, publications, etc.
 };
 ```
 
-### Contact Form
-Update the Web3Forms access key in `config.js`:
+---
 
-```javascript
-contactForm: {
-    _accessKey: "ACESS_KEY_HERE"
-}
-```
+## 📜 License & Credits
 
-## 🎯 Key Features Implementation
-
-### Dynamic Project Loading
-- Projects are loaded from `config.js`
-- Icons automatically assigned based on project names
-- Easy to add/remove projects by editing configuration
-
-### Staggered Animations[1]
-- Featured projects load row by row
-- Other sections animate on scroll with proper timing
-- Each card has individual timing delays for smooth transitions
-
-### Responsive Design
-- Mobile-first approach with breakpoints at 768px, 1024px, 480px
-- Optimized grid layouts for all screen sizes
-- Touch-friendly navigation and interactions
-
-## 🎨 Customization
-
-### Colors & Theme
-Modify CSS variables in `styles.css`:
-
-```css
-:root {
-    --primary-color: #7c3aed;
-    --secondary-color: #a855f7;
-    --accent-color: #06b6d4;
-    --bg-dark: #0c0a1a;
-    --bg-darker: #050314;
-    /* ... other colors */
-}
-```
-
-### Animations
-Adjust AOS settings in `script.js`:
-
-```javascript
-AOS.init({
-    duration: 600,
-    easing: 'ease-out-cubic',
-    once: true,
-    offset: 100
-});
-```
-
-## 📱 Browser Support
-
-- ✅ Chrome (latest)
-- ✅ Firefox (latest)
-- ✅ Safari (latest)
-- ✅ Edge (latest)
-- ✅ Mobile browsers
-
-## 🚀 Deployment Options
-
-### GitHub Pages
-1. Push code to GitHub repository
-2. Go to Settings → Pages
-3. Select source branch (main)
-4. Site will be available at `itsmevikashkumarsingh.github.io/portfolio-website`
-
-### Netlify
-1. Connect GitHub repository: `https://github.com/ItsMeVikashKumarSingh/portfolio-website.git`
-2. Build command: (none needed)
-3. Publish directory: `/` (root)
-4. Deploy automatically on push
-
-### Vercel
-1. Import GitHub repository
-2. No build configuration needed
-3. Deploy with one click
-
-## 🎪 Live Demo
-
-Visit the live website at: [Portfolio Website](https://portfolio-vikash-kumar-singh.netlify.app)
-
-## 👨‍💻 Author
-
-**Vikash Kumar Singh**
-- **Location**: Bihar, India
-- **Focus**: Android and Backend Developer learning AI[1]
-- **GitHub**: [@ItsMeVikashKumarSingh](https://github.com/ItsMeVikashKumarSingh)
-- **LinkedIn**: [itsmevikashkumarsingh](https://linkedin.com/in/itsmevikashkumarsingh)
-- **Email**: vikashkumarsingh8352@gmail.com
-- **Telegram**: [@encrypted_ghost](https://t.me/encrypted_ghost)
-- **Instagram**: [@encrypted.ghost](https://www.instagram.com/encrypted.ghost)
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 🔍 Project Highlights
-
-- **Fresh Graduate**: B.Tech in AI & Data Science (2025)
-- **44+ Repositories**: Active GitHub contributor
-- **2 Publications**: Research papers in encryption and neural program repair
-- **Red Hat Certified**: System Administrator certification
-- **Open Source**: Hacktoberfest 2024 organizer and maintainer
-
-## 📝 Changelog
-
-### v1.0.0 (2025-07-19)
-- ✅ Initial release with futuristic design[1]
-- ✅ Responsive layout implementation
-- ✅ Dynamic project loading system
-- ✅ Staggered loading animations[1]
-- ✅ Contact form integration
-- ✅ Mobile optimization
-- ✅ Enhanced hover effects and UI animations[1]
-
-⭐ **Star this repository if you found it helpful!** ⭐
-
-**Repository URL**: https://github.com/ItsMeVikashKumarSingh/portfolio-website.git
+Designed & Engineered by [Vikash Kumar Singh](https://github.com/ItsMeVikashKumarSingh).
+Open-source under the MIT License.

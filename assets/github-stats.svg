@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="495" height="195" viewBox="0 0 495 195" fill="none" role="img" aria-label="Vikash Kumar Singh GitHub Stats">
+  <defs>
+    <linearGradient id="card-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#07314e"/>
+      <stop offset="100%" stop-color="#041b2c"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <rect width="495" height="195" rx="14" fill="url(#card-grad)" stroke="#2f7fae" stroke-width="0.8" filter="url(#shadow)"/>
+
+  <!-- Header -->
+  <g transform="translate(25, 32)">
+    <circle cx="6" cy="6" r="4" fill="#67e8f9">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="20" y="10" font-family="'JetBrains Mono', 'Segoe UI', monospace" font-size="14" font-weight="700" fill="#eaf7ff" letter-spacing="1">VIKASH KUMAR SINGH · GITHUB TELEMETRY</text>
+  </g>
+
+  <!-- Divider -->
+  <line x1="25" y1="52" x2="470" y2="52" stroke="#2f7fae" stroke-width="0.6" opacity="0.5"/>
+
+  <!-- Stats Grid -->
+  <!-- Public Repositories -->
+  <g transform="translate(30, 85)">
+    <text x="0" y="0" font-family="'JetBrains Mono', monospace" font-size="10" fill="#7fc4e6" letter-spacing="1.5">PUBLIC REPOSITORIES</text>
+    <text x="0" y="24" font-family="'Inter', system-ui, sans-serif" font-size="22" font-weight="700" fill="#ffffff">67</text>
+    <text x="38" y="22" font-family="'JetBrains Mono', monospace" font-size="10" fill="#4ade80">▲ +23 new</text>
+  </g>
+
+  <!-- Total Contributions -->
+  <g transform="translate(260, 85)">
+    <text x="0" y="0" font-family="'JetBrains Mono', monospace" font-size="10" fill="#7fc4e6" letter-spacing="1.5">TOTAL CONTRIBUTIONS</text>
+    <text x="0" y="24" font-family="'Inter', system-ui, sans-serif" font-size="22" font-weight="700" fill="#ffffff">2,471<tspan fill="#a78bfa" font-size="16">+</tspan></text>
+    <text x="82" y="22" font-family="'JetBrains Mono', monospace" font-size="10" fill="#a78bfa">streak active</text>
+  </g>
+
+  <!-- Followers & Following -->
+  <g transform="translate(30, 145)">
+    <text x="0" y="0" font-family="'JetBrains Mono', monospace" font-size="10" fill="#7fc4e6" letter-spacing="1.5">NETWORK AUDIENCE</text>
+    <text x="0" y="22" font-family="'Inter', system-ui, sans-serif" font-size="16" font-weight="600" fill="#eaf7ff">7 <tspan fill="#64748b" font-size="12">Followers</tspan>  ·  4 <tspan fill="#64748b" font-size="12">Following</tspan></text>
+  </g>
+
+  <!-- Verification Badges -->
+  <g transform="translate(260, 145)">
+    <text x="0" y="0" font-family="'JetBrains Mono', monospace" font-size="10" fill="#7fc4e6" letter-spacing="1.5">VERIFIED CREDENTIALS</text>
+    <text x="0" y="22" font-family="'Inter', system-ui, sans-serif" font-size="13" font-weight="600" fill="#fcd34d">RHCSA  ·  GCP Certified</text>
+  </g>
+</svg>
